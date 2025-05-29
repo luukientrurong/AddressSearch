@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private val addressViewModel by viewModels<SearchAddressViewModel>()
     private val addressAdapter by lazy { AddressAdapter() }
     private var searchJob: Job? = null
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,10 +50,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         addressViewModel.isLoading.observe(this) {
-            if (it){
+            if (it) {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.imgSearch.visibility = View.GONE
-            }else{
+            } else {
                 binding.progressBar.visibility = View.GONE
                 binding.imgSearch.visibility = View.VISIBLE
             }
@@ -82,21 +83,20 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                if(s.isNullOrEmpty()){
-                    binding.edtSearch.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-                }else{
-                    binding.edtSearch.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.icon_close,0)
-
-                }
-                val keyWord = s.toString().trim()
-                addressAdapter.setKeyWord(keyWord)
-                searchJob?.cancel()
-                searchJob = MainScope().launch {
+                if (s.isNullOrEmpty()) {
+                    binding.edtSearch.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                    addressAdapter.diff.submitList(emptyList<Address>())
+                } else {
+                    binding.edtSearch.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.icon_close, 0)
+                    val keyWord = s.toString().trim()
+                    addressAdapter.setKeyWord(keyWord)
+                    searchJob?.cancel()
+                    searchJob = MainScope().launch {
                         delay(1000)
                         addressViewModel.searchAddress(keyWord)
                     }
                 }
-
+            }
 
         })
     }
@@ -108,9 +108,9 @@ class MainActivity : AppCompatActivity() {
             intent.setPackage("com.google.android.apps.maps")
             if (intent.resolveActivity(packageManager) != null) {
                 startActivity(intent)
-                Log.e("checkGGMap","ko null")
+                Log.e("checkGGMap", "ko null")
             } else {
-                Log.e("checkGGMap","null")
+                Log.e("checkGGMap", "null")
 
                 val browserIntent = Intent(
                     Intent.ACTION_VIEW,
